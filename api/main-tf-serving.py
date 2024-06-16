@@ -2,23 +2,19 @@ from fastapi import FastAPI, File, UploadFile
 import uvicorn
 import numpy as np
 from io import BytesIO
-from PIL import Image 
-import tensorflow as tf
+from PIL import Image
 import os
-import requests 
+import requests
 
-app = FastAPI() 
+app = FastAPI()
 
-# MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'models', '1.keras')
-# MODEL = tf.keras.models.load_model(MODEL_PATH)
+endpoint = "http://localhost:8503/v1/models/potatoes_model:predict"
 
-endpoint = "http://localhost:8502/v1/models/potatoes_model:predict"
-
-CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"] 
+CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
 @app.get("/ping")
 async def ping():
-    return "Hello, Shreyas R here"  
+    return "Hello, Shreyas R here"
 
 def read_file_as_image(data) -> np.ndarray:
     image = np.array(Image.open(BytesIO(data)))
@@ -31,16 +27,20 @@ async def predict(
     image = read_file_as_image(await file.read())
     img_batch = np.expand_dims(image, 0)
 
+    json_data = {
+        "instances": img_batch.tolist()
+    }
+
     response = requests.post(endpoint, json=json_data)
     prediction = np.array(response.json()["predictions"][0])
-    
+
     predicted_class = CLASS_NAMES[np.argmax(prediction)]
     confidence = np.max(prediction)
-    
+
     return {
-        'class': predicted_class, 
+        'class': predicted_class,
         'confidence': float(confidence)
-    } 
+    }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='localhost', port = 8000)
+    uvicorn.run(app, host='localhost', port=8000)

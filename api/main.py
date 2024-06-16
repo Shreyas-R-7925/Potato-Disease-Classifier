@@ -4,6 +4,7 @@ import numpy as np
 from io import BytesIO
 from PIL import Image 
 import tensorflow as tf
+from fastapi.middleware.cors import CORSMiddleware
 
 import os
 
@@ -11,6 +12,19 @@ app = FastAPI()
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '..', 'models', '1.keras')
 MODEL = tf.keras.models.load_model(MODEL_PATH)
+
+origins = [
+    "http://localhost", 
+    "http://localhost:5173",
+] 
+
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"] 
 
