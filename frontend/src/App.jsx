@@ -1,9 +1,15 @@
 import React from 'react'
-import {ImageUpload} from './components';
+import {Actions, ImageUpload} from './components'; 
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 
 const App = () => {
   return (
-    <div><ImageUpload /></div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ImageUpload />} />
+        <Route path="/remedy" element={<Actions />} />                  
+      </Routes>
+    </BrowserRouter>
   )
 }
 

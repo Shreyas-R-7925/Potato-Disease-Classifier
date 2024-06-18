@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Dropzone from 'react-dropzone';
+import { Link } from 'react-router-dom';
 
 import { potato } from '../assets';
 
@@ -69,58 +70,78 @@ const ImageUpload = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100">
-      <header className="w-full bg-blue-600 p-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-white text-xl">Potato Disease</h1>
-          <img src={potato} alt="Logo" className="w-10 h-10 rounded-full" />
-        </div>
+    <div className="flex flex-col items-center justify-center bg-gray-100 min-h-screen">
+      <header className="w-full bg-lime-600 p-4 fixed top-0 z-10">
+        <Link to = "/">
+          <div className="flex items-center">
+            <img src={potato} alt="Logo" className="w-10 h-10 rounded-full" />
+            &nbsp;
+            <h1 className="text-white text-xl font-mono">BlightDetect</h1>
+          </div>
+        </Link>
+        
       </header>
 
-      <main className="flex flex-col items-center w-full mt-8">
-        <div className={`w-full max-w-md bg-white rounded-lg shadow-md p-4 ${!image ? 'border-2 border-dashed border-gray-400' : ''}`}>
-          {image && (
-            <div className="w-full h-64">
-              <img src={preview} alt="Preview" className="object-cover w-full h-full" />
-            </div>
-          )}
+      <main className="flex flex-col items-center w-full mt-10">
+        <div className="mb-8 text-center w-full">
+          <p className="text-3xl font-mono">Spot the Blight: Upload Your Leaf Image Now!</p>
+        </div>
+        
+        <div className={`max-w-md bg-white rounded-lg p-4 ${!image ? 'border-2 border-dashed border-gray-400' : ''}`}>
           {!image && (
             <div className="p-4">
               <Dropzone onDrop={acceptedFiles => onSelectFile(acceptedFiles)}>
                 {({ getRootProps, getInputProps }) => (
                   <div {...getRootProps()} className="border-2 border-dashed border-gray-400 p-4 text-center cursor-pointer">
                     <input {...getInputProps()} />
-                    <p>Drag and drop an image of a potato plant leaf to process</p>
+                    <p>Drag and Drop Your Leaf Image Here for Quick Diagnosis!</p>
                   </div>
                 )}
               </Dropzone>
             </div>
           )}
-          {data && (
-            <div className="p-4">
-              <table className="min-w-full bg-white border border-gray-300">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2 border-b">Label</th>
-                    <th className="px-4 py-2 border-b text-right">Confidence</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="px-4 py-2 border-b">{data.class}</td>
-                    <td className="px-4 py-2 border-b text-right">{confidence}%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-          {isLoading && (
-            <div className="flex flex-col items-center justify-center p-4">
-              <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-              <p className="mt-2 text-xl">Processing</p>
+
+          {image && (
+            <div className="flex flex-row justify-between items-center">
+              <div className="w-2/3 h-56">
+                <img src={preview} alt="Preview" className="object-cover w-full h-full" />
+              </div>
+              <div className="w-1/2 text-center">
+                {data && (
+                  <div className="p-4">
+                    <p className="mb-4 ml-2 font-mono">Diagnosis Done: It's <span className='font-bold text-lg text-green-800'> {data.class} </span> with a confidence of <span className='font-bold text-lg text-green-800'>{confidence}%</span></p>
+
+                    {/* <table className="w-full bg-white border border-gray-300">
+                      <thead>
+                        <tr>
+                          <th className="px-4 py-2 border-b">Label</th>
+                          <th className="px-4 py-2 border-b text-right">Confidence</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="px-4 py-2 border-b">{data.class}</td>
+                          <td className="px-4 py-2 border-b text-right">{confidence}%</td>
+                        </tr>
+                      </tbody>
+                    </table> */} 
+                    {
+                      (data.class == 'Late Blight' || data.class == 'Early Blight') ? <p className='font-mono text-300'>In order to Stay Blight-Free: <Link to="/remedy" className="font-mono text-sm &nbsp; &nbsp; text-black px-2 py-2 bg-gray-200 rounded"> Click here!</Link></p> : <></>
+                    }
+                    
+                  </div>
+                )}
+                {isLoading && (
+                  <div className="flex flex-col items-center justify-center p-4">
+                    <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
+                    <p className="mt-2 text-xl">Processing</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
+
         {data && (
           <button
             onClick={clearData}
